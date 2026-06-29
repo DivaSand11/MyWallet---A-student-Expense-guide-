@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Profile — MyWallet{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center gap-2">
+    <h4>👤 My Profile</h4>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Full Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ current_user.name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" class="form-control" value="{{ current_user.email }}" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Monthly Income (₹)</label>
+                    <input type="number" name="monthly_income" class="form-control" step="0.01" value="{{ current_user.monthly_income }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Savings Goal (₹)</label>
+                    <input type="number" name="savings_goal" class="form-control" step="0.01" value="{{ current_user.savings_goal }}">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-semibold">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

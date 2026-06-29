@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Analytics — MyWallet{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4>📊 Analytics — {{ month_name }}</h4>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Category Pie Chart -->
+    <div class="col-md-5">
+        <div class="card p-3">
+            <h6 class="fw-bold mb-3">Spending by Category</h6>
+            <canvas id="categoryChart" height="220"></canvas>
+        </div>
+    </div>
+    <!-- Monthly Bar Chart -->
+    <div class="col-md-7">
+        <div class="card p-3">
+            <h6 class="fw-bold mb-3">Last 6 Months</h6>
+            <canvas id="monthlyChart" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Category Table -->
+{% if category_data %}
+<div class="card p-3 mb-4">
+    <h6 class="fw-bold mb-3">Category Breakdown</h6>
+    <table class="table table-hover mb-0">
+        <thead><tr><th>Category</th><th class="text-end">Amount Spent</th></tr></thead>
+        <tbody>
+        {% for name, icon, total in category_data %}
+        <tr>
+            <td>{{ icon }} {{ name }}</td>
+            <td class="text-end text-danger fw-semibold">₹{{ "%.2f"|format(total) }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Recommendations -->
+{% if recommendations %}
+<div class="card p-3">
+    <h6 class="fw-bold mb-3">🤖 Budget Recommendations (based on last 3 months)</h6>
+    <p class="text-muted small mb-3">These suggestions are based on your average spending per category. Setting these as your monthly budget helps you stay on track.</p>
+    <div class="row g-2">
+        {% for rec in recommendations %}
+        <div class="col-md-4">
+            <div class="p-3 rounded" style="background:#f8f7ff; border-left: 3px solid var(--primary);">
+                <div class="fw-semibold mb-1">{{ rec.icon }} {{ rec.category }}</div>
+                <div class="small text-muted">Avg spending: ₹{{ "%.0f"|format(rec.avg_spending) }}</div>
+                <div class="small text-success fw-semibold">Suggested budget: ₹{{ "%.0f"|format(rec.suggested_budget) }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+fetch('/analytics/data').then(r => r.json()).then(data => {
+    // Category Pie
+    new Chart(document.getElementById('categoryChart'), {
+        type: 'doughnut',
+        data: {
+            labels: data.category.labels,
+            datasets: [{
+                data: data.category.values,
+                backgroundColor: ['#6c5ce7','#00cec9','#fd79a8','#fdcb6e','#e17055','#00b894','#74b9ff','#a29bfe','#fab1a0','#81ecec'],
+                borderWidth: 2
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+    });
+
+    // Monthly Bar
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: {
+            labels: data.monthly.labels,
+            datasets: [{
+                label: 'Expenses (₹)',
+                data: data.monthly.values,
+                backgroundColor: 'rgba(108,92,231,0.7)',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+});
+</script>
+{% endblock %}

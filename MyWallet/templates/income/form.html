@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if income else 'Add' }} Income — MyWallet{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4>{{ '✏️ Edit' if income else '➕ Add' }} Income</h4>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Source</label>
+                    <input type="text" name="source" class="form-control" placeholder="e.g. Salary, Freelance" value="{{ income.source if income else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Amount (₹)</label>
+                    <input type="number" name="amount" class="form-control" step="0.01" value="{{ income.amount if income else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Date</label>
+                    <input type="date" name="date" class="form-control" value="{{ income.date.strftime('%Y-%m-%d') if income else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Note (optional)</label>
+                    <input type="text" name="note" class="form-control" value="{{ income.note if income else '' }}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill fw-semibold">{{ 'Update' if income else 'Add Income' }}</button>
+                    <a href="{{ url_for('income.index') }}" class="btn btn-outline-secondary flex-fill">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

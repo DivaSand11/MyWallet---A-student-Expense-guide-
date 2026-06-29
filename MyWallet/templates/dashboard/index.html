@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — MyWallet{% endblock %}
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4>👋 Hello, {{ current_user.name.split()[0] }}!</h4>
+        <p class="text-muted mb-0">{{ month_name }} Overview</p>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
+            <div class="icon"><i class="bi bi-arrow-down-circle"></i></div>
+            <div class="label">Total Income</div>
+            <div class="value">₹{{ "%.2f"|format(total_income) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #d63031, #e17055);">
+            <div class="icon"><i class="bi bi-arrow-up-circle"></i></div>
+            <div class="label">Total Expenses</div>
+            <div class="value">₹{{ "%.2f"|format(total_expenses) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background: {% if balance >= 0 %}linear-gradient(135deg, #00b894, #00cec9){% else %}linear-gradient(135deg, #636e72, #2d3436){% endif %};">
+            <div class="icon"><i class="bi bi-wallet2"></i></div>
+            <div class="label">Balance</div>
+            <div class="value">₹{{ "%.2f"|format(balance) }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent Expenses -->
+    <div class="col-md-7">
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Recent Expenses</h6>
+                <a href="{{ url_for('expense.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            {% if recent_expenses %}
+            <table class="table table-hover mb-0">
+                <thead><tr><th>Title</th><th>Category</th><th>Date</th><th class="text-end">Amount</th></tr></thead>
+                <tbody>
+                {% for exp in recent_expenses %}
+                <tr>
+                    <td>{{ exp.title }}</td>
+                    <td>{{ exp.category.icon }} {{ exp.category.name }}</td>
+                    <td class="text-muted">{{ exp.date.strftime('%d %b') }}</td>
+                    <td class="text-end text-danger fw-semibold">₹{{ "%.2f"|format(exp.amount) }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted text-center py-3 mb-0">No expenses yet. <a href="{{ url_for('expense.add') }}">Add one!</a></p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="col-md-5">
+        <!-- Budget Warnings -->
+        {% if warnings %}
+        <div class="card p-3 mb-3 border-warning">
+            <h6 class="fw-bold mb-3">⚠️ Budget Warnings</h6>
+            {% for w in warnings %}
+            <div class="mb-2">
+                <div class="d-flex justify-content-between mb-1">
+                    <small>{{ w.icon }} {{ w.category }}</small>
+                    <small class="text-danger fw-semibold">{{ w.percent }}%</small>
+                </div>
+                <div class="progress">
+                    <div class="progress-bar bg-danger" style="width:{{ w.percent }}%"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Savings Goals -->
+        {% if savings %}
+        <div class="card p-3">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">🐷 Savings Goals</h6>
+                <a href="{{ url_for('savings.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            {% for s in savings[:3] %}
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <small class="fw-semibold">{{ s.title }}</small>
+                    <small class="text-muted">₹{{ "%.0f"|format(s.saved_amount) }} / ₹{{ "%.0f"|format(s.goal_amount) }}</small>
+                </div>
+                <div class="progress">
+                    {% set pct = [(s.saved_amount / s.goal_amount * 100)|round|int, 100]|min if s.goal_amount > 0 else 0 %}
+                    <div class="progress-bar" style="width:{{ pct }}%; background:var(--primary)"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not warnings and not savings %}
+        <div class="card p-3 text-center text-muted">
+            <p class="mb-2">🚀 Get started!</p>
+            <a href="{{ url_for('budget.index') }}" class="btn btn-sm btn-primary mb-2 w-100">Set Budget</a>
+            <a href="{{ url_for('savings.add') }}" class="btn btn-sm btn-outline-primary w-100">Add Savings Goal</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

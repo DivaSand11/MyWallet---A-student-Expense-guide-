@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if saving else 'Add' }} Savings Goal — MyWallet{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4>{{ '✏️ Edit' if saving else '➕ New' }} Savings Goal</h4>
+</div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Goal Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="e.g. New Laptop, Emergency Fund" value="{{ saving.title if saving else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Target Amount (₹)</label>
+                    <input type="number" name="goal_amount" class="form-control" step="0.01" value="{{ saving.goal_amount if saving else '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Amount Already Saved (₹)</label>
+                    <input type="number" name="saved_amount" class="form-control" step="0.01" value="{{ saving.saved_amount if saving else 0 }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Deadline (optional)</label>
+                    <input type="date" name="deadline" class="form-control" value="{{ saving.deadline.strftime('%Y-%m-%d') if saving and saving.deadline else '' }}">
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill fw-semibold">{{ 'Update' if saving else 'Create Goal' }}</button>
+                    <a href="{{ url_for('savings.index') }}" class="btn btn-outline-secondary flex-fill">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
